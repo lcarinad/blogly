@@ -13,3 +13,8 @@ class User(db.Model):
     first_name=db.Column(db.String, nullable=False)
     last_name=db.Column(db.String, nullable=False)
     image_url=db.Column(db.String, nullable=False, default='https://static.thenounproject.com/png/4613680-200.png')
+    
+    def __repr__(self):
+        """show info about user"""
+        u = self
+        return f"<User {u.id} {u.first_name} {u.last_name}>"
