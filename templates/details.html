@@ -1,0 +1,28 @@
+{% extends 'base.html' %} {%block title%} About {{user.first_name}} {% endblock
+%} {% block content %}
+
+<div class="ms-4">
+  <img
+    src="{{user.image_url}}"
+    class="img-thumbnail"
+    alt="" />
+  <h1>{{user.first_name}} {{user.last_name}}</h1>
+
+  <button
+    type="button"
+    class="btn btn-primary">
+    Edit
+  </button>
+  <button
+    type="button"
+    class="btn btn-danger">
+    Delete
+  </button>
+  <a
+    class="btn btn-info"
+    href="/"
+    role="button"
+    >Go back</a
+  >
+</div>
+{% endblock %}
