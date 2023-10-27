@@ -1,23 +1,30 @@
 {% extends 'base.html' %} {%block title%} About {{user.first_name}} {% endblock
 %} {% block content %}
 
-<div class="ms-4">
+<div class="container ms-4">
   <img
     src="{{user.image_url}}"
     class="img-thumbnail"
     alt="" />
   <h1>{{user.first_name}} {{user.last_name}}</h1>
 
-  <button
-    type="button"
-    class="btn btn-primary">
-    Edit
-  </button>
-  <button
-    type="button"
-    class="btn btn-danger">
-    Delete
-  </button>
+  <a
+    class="btn btn-primary"
+    href="/users/{{user.id}}/edit"
+    role="button"
+    >Edit</a
+  >
+  <form
+    method="post"
+    action="/users/{{user.id}}/delete"
+    style="display: inline">
+    <button
+      type="submit"
+      class="btn btn-danger">
+      Delete
+    </button>
+  </form>
+
   <a
     class="btn btn-info"
     href="/"

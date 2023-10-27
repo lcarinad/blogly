@@ -36,7 +36,11 @@ def submit_new_user():
     """taking user input from form, send to users db, and redirect to /users"""
     first_name = request.form["first_name"]
     last_name = request.form["last_name"]
-    image_url = request.form["image_url"]
+    image_url = request.form.get("image_url", None)
+    
+    if not image_url:
+        default_image_url = User.image_url.default.arg
+        image_url = default_image_url
     
     new_user = User(first_name=first_name, last_name=last_name, image_url=image_url)
     
@@ -44,8 +48,37 @@ def submit_new_user():
     db.session.commit()
     return redirect("/users")
 
-@app.route('/<int:user_id>')
+@app.route('/users/<int:user_id>')
 def show_user(user_id):
-    """SHow details about a single user"""
+    """Show details about a single user"""
     user=User.query.get_or_404(user_id)
     return render_template("details.html", user=user)
+
+@app.route('/users/<int:user_id>/edit')
+def edit_user(user_id):
+    """Edit details about a single user"""
+    user=User.query.get_or_404(user_id)
+    return render_template("edit.html", user=user)
+
+@app.route('/users/<int:user_id>/edit', methods= ["POST"])
+def edit_submission(user_id):
+    first_name = request.form["first_name"]
+    last_name = request.form["last_name"]
+    image_url = request.form.get("image_url", None)
+    
+    if not image_url:
+        default_image_url = User.image_url.default.arg
+        image_url = default_image_url
+    
+    edited_user = User(first_name=first_name, last_name=last_name, image_url=image_url)
+    db.session.add(edited_user)
+    db.session.commit()
+    return render_template("details.html", user=edited_user)
+
+@app.route('/users/<int:user_id>/delete', methods = ["POST"])
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    db.session.delete(user)
+        
+    db.session.commit()
+    return redirect ("/users")
