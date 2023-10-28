@@ -30,6 +30,7 @@ class UsersTestCase(TestCase):
         db.session.rollback()
         
     def test_list_users(self):
+        """Test that user li appear on /users route"""
         with app.test_client() as client:
             resp = client.get("/users")
             html = resp.get_data(as_text=True)
@@ -68,7 +69,6 @@ class UsersTestCase(TestCase):
             
         with app.test_client() as client:
             resp = client.get(f"/users/100")
-            html = resp.get_data(as_text=True)
             self.assertEqual(resp.status_code, 404)
     
     def test_edit_submission(self):
