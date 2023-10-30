@@ -25,8 +25,9 @@ class Post(db.Model):
     id=db.Column(db.Integer, primary_key=True, autoincrement=True)
     title=db.Column(db.String(30), nullable=False)
     content=db.Column(db.String(150), nullable=False)
-    created_at=db.Column(db.DateTime, default=datetime.utcnow)
+    created_at=db.Column(db.DateTime, default=lambda: datetime.utcnow())
     user_id=db.Column(db.Integer, db.ForeignKey('users.id'))
+    
     user = db.relationship('User', backref='posts')
     
     def __repr__ (self):

@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, redirect, flash, session
+from datetime import datetime
 # from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User, Post
 
@@ -86,3 +87,28 @@ def delete_user(user_id):
         
     db.session.commit()
     return redirect ("/users")
+
+@app.route("/users/<int:user_id>/posts/new")
+def add_post(user_id):
+    """shows add post form"""
+    user = User.query.get_or_404(user_id)
+    return render_template("postform.html", user= user)
+
+@app.route("/users/<int:user_id>/posts/new", methods=["POST"])
+def submit_post(user_id):
+    """handles post submission"""
+    user = User.query.get_or_404(user_id)
+    post_title = request.form["post_title"]
+    post_content=request.form["post_content"]
+    created_at = Post.created_at.default.arg
+    
+    new_post = Post(title=post_title, content=post_content, user_id=user_id)
+    
+    db.session.add(new_post)
+    db.session.commit()
+    return redirect(f"/users/{user_id}")
+
+@app.route("/posts/<int:id>")
+def show_post(id):
+    """shows individual posts"""
+    
