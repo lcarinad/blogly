@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 
@@ -18,3 +19,15 @@ class User(db.Model):
         """show info about user"""
         u = self
         return f"<User {u.id} {u.first_name} {u.last_name}>"
+    
+class Post(db.Model):
+    __tablename__='posts'
+    id=db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title=db.Column(db.String(30), nullable=False)
+    content=db.Column(db.String(150), nullable=False)
+    created_at=db.Column(db.DateTime, default=datetime.utcnow)
+    user_id=db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('User', backref='posts')
+    
+    def __repr__ (self):
+        return f"<Post: {self.title}, Created at: {self.created_at}, Created by: {self.user_id}>"

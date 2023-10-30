@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, flash, session
 # from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User 
+from models import db, connect_db, User, Post
 
 app = Flask(__name__)
 # app.debug = True
@@ -52,7 +52,9 @@ def submit_new_user():
 def show_user(user_id):
     """Show details about a single user"""
     user=User.query.get_or_404(user_id)
-    return render_template("details.html", user=user)
+    post=Post.query.filter(Post.user_id == user.id).all()
+
+    return render_template("details.html", user=user, posts=post)
 
 @app.route('/users/<int:user_id>/edit')
 def edit_user(user_id):
