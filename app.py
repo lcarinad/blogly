@@ -113,16 +113,14 @@ def show_post(post_id):
     """shows single post"""
 
     post = Post.query.get_or_404(post_id)
-    user = post.user
-    
-    return render_template("show_post.html", user=user, post=post)
+    return render_template("show_post.html",  post=post)
 
 @app.route("/posts/<int:post_id>/edit")
 def show_edit_post_form(post_id):
     """shows form to edit post"""
     post = Post.query.get_or_404(post_id)
-    user=post.user
-    return render_template("edit_post.html", post = post, user=user)
+
+    return render_template("edit_post.html", post = post)
     
 @app.route("/posts/<int:post_id>/edit", methods=["POST"])
 def edit_post(post_id):
@@ -137,3 +135,13 @@ def edit_post(post_id):
     
     db.session.commit()
     return redirect(f"/posts/{post_id}")
+
+@app.route("/posts/<int:post_id>/delete", methods=["POST"])
+def delete_post(post_id):
+    """handles edit post form"""
+    post = Post.query.get_or_404(post_id)
+   
+    
+    db.session.delete(post)
+    db.session.commit()
+    return redirect("/users")

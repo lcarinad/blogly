@@ -1,5 +1,5 @@
-{% extends 'base.html' %} {%block title%} {{post.title}} {{user.first_name}} {%
-endblock %} {% block content %}
+{% extends 'base.html' %} {%block title%} {{post.title}}
+{{post.user.first_name}} {% endblock %} {% block content %}
 
 <div class="container ms-4">
   <h1>{{post.title}}</h1>
@@ -8,7 +8,7 @@ endblock %} {% block content %}
 
   <a
     class="btn btn-outline-info"
-    href="/users/{{user.id}}"
+    href="/users/{{post.user.id}}"
     role="button"
     >Cancel</a
   >
@@ -20,7 +20,7 @@ endblock %} {% block content %}
   >
   <form
     method="post"
-    action="/users/{{user.id}}/delete"
+    action="/posts/{{post.id}}/delete"
     style="display: inline">
     <button
       type="submit"

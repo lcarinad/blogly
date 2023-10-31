@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {%block title%} Add User {% endblock %} {% block
+{% extends 'base.html' %} {%block title%} Edit Post {% endblock %} {% block
 content %}
 <div class="container">
   <form
@@ -34,7 +34,7 @@ content %}
     </div>
     <a
       class="btn btn-danger"
-      href="/users/{{user.id}}"
+      href="/users/{{post.user.id}}"
       role="button"
       >Cancel</a
     >
