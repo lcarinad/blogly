@@ -66,6 +66,7 @@ def edit_user(user_id):
 @app.route('/users/<int:user_id>/edit', methods= ["POST"])
 def edit_submission(user_id):
     """User submits edit form"""
+    user=User.query.get_or_404(user_id)
     first_name = request.form["first_name"]
     last_name = request.form["last_name"]
     image_url = request.form.get("image_url", None)
@@ -74,10 +75,12 @@ def edit_submission(user_id):
         default_image_url = User.image_url.default.arg
         image_url = default_image_url
     
-    edited_user = User(first_name=first_name, last_name=last_name, image_url=image_url)
-    db.session.add(edited_user)
+    user.first_name=first_name 
+    user.last_name=last_name
+    user.image_url=image_url
+   
     db.session.commit()
-    return render_template("details.html", user=edited_user)
+    return render_template("details.html")
 
 @app.route('/users/<int:user_id>/delete', methods = ["POST"])
 def delete_user(user_id):
@@ -141,7 +144,7 @@ def delete_post(post_id):
     """handles edit post form"""
     post = Post.query.get_or_404(post_id)
    
-    
+    print("I've deleted************************")
     db.session.delete(post)
     db.session.commit()
     return redirect("/users")
