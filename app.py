@@ -108,7 +108,32 @@ def submit_post(user_id):
     db.session.commit()
     return redirect(f"/users/{user_id}")
 
-@app.route("/posts/<int:id>")
-def show_post(id):
-    """shows individual posts"""
+@app.route("/posts/<int:post_id>")
+def show_post(post_id):
+    """shows single post"""
+
+    post = Post.query.get_or_404(post_id)
+    user = post.user
     
+    return render_template("show_post.html", user=user, post=post)
+
+@app.route("/posts/<int:post_id>/edit")
+def show_edit_post_form(post_id):
+    """shows form to edit post"""
+    post = Post.query.get_or_404(post_id)
+    user=post.user
+    return render_template("edit_post.html", post = post, user=user)
+    
+@app.route("/posts/<int:post_id>/edit", methods=["POST"])
+def edit_post(post_id):
+    """handles edit post form"""
+    post = Post.query.get_or_404(post_id)
+   
+    post_title = request.form["post_title"]
+    post_content=request.form["post_content"]
+    
+    post.title=post_title
+    post.content=post_content
+    
+    db.session.commit()
+    return redirect(f"/posts/{post_id}")
