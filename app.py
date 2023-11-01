@@ -35,10 +35,15 @@ def add_user():
 @app.route('/users/new', methods=["POST"])
 def submit_new_user():
     """taking user input from form, send to users db, and redirect to /users"""
+    
+    
     first_name = request.form["first_name"]
     last_name = request.form["last_name"]
     image_url = request.form.get("image_url", None)
     
+    if not first_name and last_name:
+        flash("Enter both name fields.")
+        
     if not image_url:
         default_image_url = User.image_url.default.arg
         image_url = default_image_url

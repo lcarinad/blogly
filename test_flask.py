@@ -20,10 +20,16 @@ class UsersTestCase(TestCase):
         User.query.delete()
         user = User(first_name='Doug', last_name='The Pug', image_url="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Doug_the_Pug_NYC.jpg/440px-Doug_the_Pug_NYC.jpg")
         db.session.add(user)
-        db.session.commit()
+        db.session.commit()        
+          
+        # post = Post(title='First Story Eva', content='Oh hai! This is my first story!', user_id='1')
+        # db.session.add(post)
+        # db.session.commit()
         
         self.user_id=user.id
         self.user=user
+        # self.post_id=post.post_id
+        # self.post=post
         
     def tearDown(self):
         """Clean up any fouled transaction."""
