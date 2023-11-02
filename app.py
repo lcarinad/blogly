@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, redirect, flash, session
 from datetime import datetime
 # from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User, Post
+from models import db, connect_db, User, Post, Tag, PostTag
 
 app = Flask(__name__)
 # app.debug = True
@@ -35,15 +35,14 @@ def add_user():
 @app.route('/users/new', methods=["POST"])
 def submit_new_user():
     """taking user input from form, send to users db, and redirect to /users"""
-    
-    
     first_name = request.form["first_name"]
     last_name = request.form["last_name"]
     image_url = request.form.get("image_url", None)
     
-    if not first_name and last_name:
+    if not first_name or not last_name:
         flash("Enter both name fields.")
-        
+        return redirect('users/new')
+    
     if not image_url:
         default_image_url = User.image_url.default.arg
         image_url = default_image_url
@@ -71,10 +70,14 @@ def edit_user(user_id):
 @app.route('/users/<int:user_id>/edit', methods= ["POST"])
 def edit_submission(user_id):
     """User submits edit form"""
-    user=User.query.get_or_404(user_id)
+    user = User.query.get_or_404(user_id)
     first_name = request.form["first_name"]
     last_name = request.form["last_name"]
     image_url = request.form.get("image_url", None)
+    
+    if not first_name and last_name:
+        flash("Enter both name fields." )
+        return redirect(f'users/{user_id}/edit')
     
     if not image_url:
         default_image_url = User.image_url.default.arg
@@ -85,7 +88,7 @@ def edit_submission(user_id):
     user.image_url=image_url
    
     db.session.commit()
-    return render_template("details.html")
+    return render_template("details.html", user=user)
 
 @app.route('/users/<int:user_id>/delete', methods = ["POST"])
 def delete_user(user_id):
@@ -109,6 +112,10 @@ def submit_post(user_id):
     post_title = request.form["post_title"]
     post_content=request.form["post_content"]
     created_at = Post.created_at.default.arg
+    
+    if not post_title or not post_content:
+        flash("Enter both fields.")
+        return redirect(f'users/{user_id}/posts/new')
     
     new_post = Post(title=post_title, content=post_content, user_id=user_id)
     
@@ -153,3 +160,9 @@ def delete_post(post_id):
     db.session.delete(post)
     db.session.commit()
     return redirect("/users")
+
+@app.route("/tags")
+def show_tags():
+    """Show list of all tags"""
+    tags = Tag.query.all()
+    return render_template("tags.html", tags=tags)

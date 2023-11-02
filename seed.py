@@ -1,5 +1,5 @@
 from datetime import datetime
-from models import User, Post, db
+from models import User, Post, db, Tag, PostTag
 from app import app
 
 db.drop_all()
@@ -24,4 +24,19 @@ p3=Post(title='I am a cat mom too!', content='My cats are black and very lovely'
 
 db.session.add_all([p1, p2,p3])
 
+db.session.commit()
+
+t1 = Tag(name = 'Pets')
+t2 = Tag(name='Daily Stuff')
+t3=Tag(name='Careers')
+
+db.session.add_all([t1, t2, t3])
+db.session.commit()
+
+pt1 = PostTag(post_id=p1.id, tag_id=t2.id) 
+pt2 = PostTag(post_id=p2.id, tag_id=t2.id)
+pt3= PostTag(post_id=p2.id, tag_id=t1.id)
+pt4= PostTag(post_id=p3.id, tag_id=t1.id)
+
+db.session.add_all([pt1, pt2, pt3, pt4])
 db.session.commit()

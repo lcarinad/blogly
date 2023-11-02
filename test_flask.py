@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from app import app
-from models import db, User
+from models import db, User, Post
 
 app.config['SQLALCHEMY_DATABASE_URI']='postgresql:///users_test'
 app.config['SQLALCHEMY_ECHO']=False
@@ -22,14 +22,15 @@ class UsersTestCase(TestCase):
         db.session.add(user)
         db.session.commit()        
           
-        # post = Post(title='First Story Eva', content='Oh hai! This is my first story!', user_id='1')
-        # db.session.add(post)
-        # db.session.commit()
+        post = Post(title='First Story Eva', content='Oh hai! This is my first story!')
+        db.session.add(post)
+        db.session.commit()
         
+        # set instance variable
         self.user_id=user.id
         self.user=user
-        # self.post_id=post.post_id
-        # self.post=post
+        self.post_id=post.id
+        self.post=post
         
     def tearDown(self):
         """Clean up any fouled transaction."""
@@ -59,10 +60,16 @@ class UsersTestCase(TestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertIn("Pumpkin Bones", html)
             
+    def test_submit_new_user_validate_form_completion(self):           
         with app.test_client() as client:
-            d={"first_name":"Pumpkin"}
-            resp=client.post('/users/new', data=d, follow_redirects=True)
-            self.assertEqual(resp.status_code, 404)
+            d={"first_name":"Pumpkin", "last_name":None}
+            resp=client.get('/users/new', data=d, follow_redirects=True)
+            self.assertEqual(resp.status_code, 200)
+            
+        with app.test_client() as client:
+            d={"first_name":None, "last_name":'Bones'}
+            resp=client.get('/users/new', data=d, follow_redirects=True)
+            self.assertEqual(resp.status_code, 200)
            
     
     def test_show_user(self):
@@ -94,7 +101,48 @@ class UsersTestCase(TestCase):
             html = resp.get_data(as_text=True)
             self.assertEqual(resp.status_code, 200)
             self.assertNotIn("Doug The Pug", html)
+    
+
+class PostsTestCase(TestCase):
+
+    def setUp(self):
+        """Add sample user""" 
+        User.query.delete()
+        user = User(first_name='Doug', last_name='The Pug', image_url="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Doug_the_Pug_NYC.jpg/440px-Doug_the_Pug_NYC.jpg")
+        db.session.add(user)
+        db.session.commit()        
+          
+        post = Post(title='First Story Eva', content='Oh hai! This is my first story!')
+        db.session.add(post)
+        db.session.commit()
+        
+        # set instance variable
+        self.user_id=user.id
+        self.user=user
+        self.post_id=post.id
+        self.post=post
+        
+    def tearDown(self):
+        """Clean up any fouled transaction."""
+        db.session.rollback()
+        
+    def test_submit_post(self):
+        """test post method for submtting post form"""
+        with app.test_client() as client:
+            d={"post_title":"second post", "post_content":"test content body"}
+            resp = client.post(f"/users/{self.user_id}/posts/new", data=d, follow_redirects=True)
+            html = resp.get_data(as_text=True)
+            self.assertEqual(resp.status_code, 200) 
+            self.assertIn("second post", html)      
             
-           
-   
+    def test_submit_post_validate_form_completion(self):           
+        with app.test_client() as client:
+            d={"post_title":"second post", "post_content":None}
+            resp=client.post(f"/users/{self.user_id}/posts/new", data=d, follow_redirects=True)
+            expected_flash_message = "both fields"
+
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn(expected_flash_message, html)
 
