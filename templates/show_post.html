@@ -5,6 +5,16 @@
   <h1>{{post.title}}</h1>
   <p>{{post.content}}</p>
   <p class="fst-italic">By {{post.user.first_name}} {{post.user.last_name}}</p>
+  <div>
+    <span class="fw-bold"
+      >Tags: {%for tag in tags%}
+
+      <span class="badge rounded-pill text-bg-primary my-2 fst-italic"
+        >{{tag.name}}</span
+      >
+      {% endfor %}
+    </span>
+  </div>
 
   <a
     class="btn btn-outline-info"

@@ -103,7 +103,8 @@ def delete_user(user_id):
 def add_post(user_id):
     """shows add post form"""
     user = User.query.get_or_404(user_id)
-    return render_template("postform.html", user= user)
+    tags = Tag.query.all()
+    return render_template("postform.html", user= user, tags =tags)
 
 @app.route("/users/<int:user_id>/posts/new", methods=["POST"])
 def submit_post(user_id):
@@ -112,6 +113,7 @@ def submit_post(user_id):
     post_title = request.form["post_title"]
     post_content=request.form["post_content"]
     created_at = Post.created_at.default.arg
+    selected_tags = request.form.getlist("tag")
     
     if not post_title or not post_content:
         flash("Enter both fields.")
@@ -121,6 +123,14 @@ def submit_post(user_id):
     
     db.session.add(new_post)
     db.session.commit()
+    
+    for tag in selected_tags:
+        tag_selection = Tag.query.get(tag)
+        
+        if tag_selection:
+            new_post.tags.append(tag_selection)
+            
+    db.session.commit()
     return redirect(f"/users/{user_id}")
 
 @app.route("/posts/<int:post_id>")
@@ -128,7 +138,8 @@ def show_post(post_id):
     """shows single post"""
 
     post = Post.query.get_or_404(post_id)
-    return render_template("show_post.html",  post=post)
+    tags = post.tags
+    return render_template("show_post.html",  post=post, tags=tags)
 
 @app.route("/posts/<int:post_id>/edit")
 def show_edit_post_form(post_id):
@@ -153,16 +164,70 @@ def edit_post(post_id):
 
 @app.route("/posts/<int:post_id>/delete", methods=["POST"])
 def delete_post(post_id):
-    """handles edit post form"""
+    """handles post delete"""
     post = Post.query.get_or_404(post_id)
-   
-    print("I've deleted************************")
+    
     db.session.delete(post)
     db.session.commit()
     return redirect("/users")
 
 @app.route("/tags")
-def show_tags():
+def show_tags_list():
     """Show list of all tags"""
     tags = Tag.query.all()
     return render_template("tags.html", tags=tags)
+
+@app.route("/tags/<int:id>")
+def show_tag(id):
+    """ Shows single tag """
+    tag = Tag.query.get_or_404(id)
+    posts = tag.posts
+    return render_template("show_tag.html", tag = tag, posts=posts)
+
+@app.route("/tags/new")
+def add_tag():
+    """shows add tag form"""
+    return render_template("tagform.html")
+
+@app.route("/tags/new", methods=["POST"])
+def submit_tag():
+    """handle new tag form submission"""
+    name = request.form["name"]
+    if not name:
+        flash("Enter a tag name")
+        return redirect("/tags/new")
+    
+    new_tag = Tag(name=name)
+    
+    db.session.add(new_tag)
+    db.session.commit()
+    
+    return redirect('/tags')
+
+@app.route("/tags/<int:id>/edit")
+def show_edit_tag_form(id):
+    """Show edit form"""
+    tag = Tag.query.get_or_404(id)
+    
+    return render_template('edit_tag.html', tag=tag)
+
+@app.route("/tags/<int:id>/edit", methods=["POST"])
+def edit_tag(id):
+    """Edit tag name"""
+    tag = Tag.query.get_or_404(id)
+    name = request.form["name"]
+    
+    tag.name = name
+    db.session.commit()
+    
+    return redirect('/tags')
+    
+@app.route("/tags/<int:id>/delete", methods=["POST"])
+def delete_tag(id):
+    """Delete a tag"""
+    tag = Tag.query.get_or_404(id)
+    
+    db.session.delete(tag)
+    db.session.commit()
+  
+    return redirect("/tags")

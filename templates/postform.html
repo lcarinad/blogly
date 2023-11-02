@@ -28,6 +28,21 @@ content %}
         name="post_content"
         rows="3"></textarea>
     </div>
+    {% for tag in tags%}
+    <div class="mb-3 form-check">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        name="tag"
+        value="{{tag.id}}" />
+      <label
+        for="{{tag.name}}-tag"
+        class="form-check-label"
+        >{{tag.name}}</label
+      >
+    </div>
+    {% endfor %}
+
     <a
       class="btn btn-danger"
       href="/users/{{user.id}}"
